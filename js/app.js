@@ -1,40 +1,88 @@
-// Enemies our player must avoid
-var Enemy = function() {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
+class SizeObject {
+    constructor(width, heigth) {
+        this.width = width
+        this.heigth = heigth
+    }
+}
+const playerSize = new SizeObject(65, 80)
+const enemySize = new SizeObject(90, 63)
+const tileSize = new SizeObject(100, 83)
+const border = new SizeObject(20, 20)
 
-    // The image/sprite for our enemies, this uses
-    // a helper we've provided to easily load images
-    this.sprite = 'images/enemy-bug.png';
+const body = document.querySelector('body')
+const div = document.createElement('div')
+
+body.appendChild(div)
+div.style.fontSize = '30px';
+
+class Enemy {
+    constructor(x, y, speed) {
+        this.x = x;
+        this.y = y;
+        this.speed = speed;
+        this.sprite = 'images/enemy-bug.png';
+        this.start = -enemySize.width;
+    }
+    checkCollision() {
+        if (((player.x > this.x && player.x < this.x + enemySize.width) || (player.x < this.x && player.x > this.x - enemySize.width))
+            && player.y - this.y < enemySize.heigth
+        ) {
+            console.log('error');
+            player.x = player.startX
+            player.y = player.startY
+        }
+        console.log(player)
+    }
+    update(dt) {
+        if (this.x > tileSize.width * 5) {
+            this.x = this.start
+            this.speed = Math.floor(Math.random() * (400 - 100) + 100);
+        }
+        this.x += dt * this.speed;
+        this.checkCollision()
+    };
+    render() {
+        ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    };
 };
 
-// Update the enemy's position, required method for game
-// Parameter: dt, a time delta between ticks
-Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-};
+class Player {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.sprite = 'images/char-boy.png';
+        this.score = 0;
+        this.startY = tileSize.heigth * 5 - border.heigth;
+        this.startX = tileSize.width * 2
+    }
+    update() {
+        if (this.y + border.heigth < tileSize.heigth) {
+            this.y = this.startY;
+            this.x = this.startX
+            this.score += 1
+        }
+        div.textContent = `score: ${this.score}`
+    }
+    render() {
+        ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    }
+    handleInput(key) {
+        if (key === 'left' && this.x > border.width) { this.x -= tileSize.width }
+        if (key === 'right' && this.x < tileSize.width * 4) { this.x += tileSize.width }
+        if (key === 'up') { this.y -= tileSize.heigth }
+        if (key === 'down' && this.y + border.heigth < tileSize.heigth * 5) { this.y += tileSize.heigth }
+    }
+}
 
-// Draw the enemy on the screen, required method for game
-Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-};
+const enemy1 = new Enemy(-enemySize.width, tileSize.heigth - border.heigth, 100)
+const enemy2 = new Enemy(-enemySize.width, tileSize.heigth * 2 - border.heigth, 150)
+const enemy3 = new Enemy(-enemySize.width, tileSize.heigth * 3 - border.heigth, 250)
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
+const allEnemies = [enemy1, enemy2, enemy3]
 
+const player = new Player(tileSize.width * 2, tileSize.heigth * 5 - border.heigth)
 
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
-
-
-
-// This listens for key presses and sends the keys to your
-// Player.handleInput() method. You don't need to modify this.
-document.addEventListener('keyup', function(e) {
+document.addEventListener('keyup', function (e) {
     var allowedKeys = {
         37: 'left',
         38: 'up',
