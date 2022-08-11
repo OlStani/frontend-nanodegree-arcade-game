@@ -25,11 +25,12 @@ class Enemy {
     }
     checkCollision() {
         if (((player.x > this.x && player.x < this.x + enemySize.width) || (player.x < this.x && player.x > this.x - enemySize.width))
-            && player.y - this.y < enemySize.heigth
+            && player.y - this.y < enemySize.heigth && player.y + border.heigth > this.y
         ) {
             console.log('error');
             player.x = player.startX
             player.y = player.startY
+            player.score = 0
         }
         console.log(player)
     }
